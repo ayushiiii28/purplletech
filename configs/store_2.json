@@ -1,0 +1,89 @@
+{
+  "store_id": "STORE_002",
+
+  "cameras": {
+
+    "ENTRY_CAM_1": {
+
+      "video_path": "../videos/store_2/entry 1.mp4",
+
+      "purpose": "entry_tracking",
+
+      "zones": {
+
+        "ENTRY_GATE": [
+          [450,100],
+          [1450,100],
+          [1450,950],
+          [450,950]
+        ]
+      }
+    },
+
+    "ENTRY_CAM_2": {
+
+      "video_path": "../videos/store_2/entry 2.mp4",
+
+      "purpose": "exit_tracking",
+
+      "zones": {
+
+        "EXIT_GATE": [
+          [450,100],
+          [1450,100],
+          [1450,950],
+          [450,950]
+        ]
+      }
+    },
+
+    "ZONE_CAM": {
+
+      "video_path": "../videos/zone.mp4",
+
+      "purpose": "engagement_tracking",
+
+      "zones": {
+
+        "LEFT_SHELF": [
+          [0,0],
+          [650,0],
+          [650,1080],
+          [0,1080]
+        ],
+
+        "CENTER_WALKWAY": [
+          [650,0],
+          [1250,0],
+          [1250,1080],
+          [650,1080]
+        ],
+
+        "RIGHT_SHELF": [
+          [1250,0],
+          [1920,0],
+          [1920,1080],
+          [1250,1080]
+        ]
+      }
+    },
+
+    "BILLING_CAM": {
+
+      "video_path": "../videos/store_2/billing_area.mp4",
+
+      "purpose": "billing_queue",
+
+      "zones": {
+
+        "BILLING_QUEUE": [
+          [0,250],
+          [900,250],
+          [900,1080],
+          [0,1080]
+        ]
+      }
+    }
+  }
+}
+

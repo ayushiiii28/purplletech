@@ -1,0 +1,103 @@
+{
+  "store_id": "STORE_001",
+
+  "cameras": {
+
+    "CAM_1": {
+
+      "video_path": "../videos/store_1/cam1.mp4",
+
+      "purpose": "engagement_tracking",
+
+      "zones": {
+
+        "SKINCARE_SHELF": [
+          [0,0],
+          [700,0],
+          [700,1080],
+          [0,1080]
+        ],
+
+        "CENTER_KIOSK": [
+          [700,350],
+          [1300,350],
+          [1300,900],
+          [700,900]
+        ],
+
+        "MAKEUP_TABLE": [
+          [1300,0],
+          [1920,0],
+          [1920,1080],
+          [1300,1080]
+        ]
+      }
+    },
+
+    "CAM_2": {
+
+      "video_path": "../videos/store_1/cam2.mp4",
+
+      "purpose": "engagement_tracking",
+
+      "zones": {
+
+        "MAKEUP_SHELF": [
+          [800,80],
+          [1920,80],
+          [1920,580],
+          [800,580]
+        ],
+
+        "TESTER_AREA": [
+          [0,250],
+          [520,250],
+          [520,850],
+          [0,850]
+        ],
+
+        "CENTER_WALKWAY": [
+          [700,720],
+          [1250,720],
+          [1250,1080],
+          [700,1080]
+        ]
+      }
+    },
+
+    "CAM_3": {
+
+      "video_path": "../videos/store_1/cam3.mp4",
+
+      "purpose": "entry_tracking",
+
+      "zones": {
+
+        "ENTRY_GATE": [
+          [450,50],
+          [1500,50],
+          [1500,850],
+          [450,850]
+        ]
+      }
+    },
+
+    "CAM_5": {
+
+      "video_path": "../videos/store_1/cam5.mp4",
+
+      "purpose": "billing_queue",
+
+      "zones": {
+
+        "BILLING_QUEUE": [
+          [0,300],
+          [900,300],
+          [900,1080],
+          [0,1080]
+        ]
+      }
+    }
+  }
+}
+
