@@ -1,150 +1,141 @@
+# CHOICES.md
+
 # Engineering Choices and Tradeoffs
 
-## Overview
+## Decision 1: Detection Model Selection
 
-This document explains key engineering decisions, architectural tradeoffs, and implementation choices made during development of the AI Retail Store Intelligence System.
+### Options Considered
+
+* YOLOv8n
+* YOLOv8s
+* RT-DETR
+* YOLOv9
+
+### AI Suggestion
+
+AI-assisted exploration suggested YOLOv8 because it offered the best balance between accuracy, inference speed, deployment simplicity, and ecosystem maturity.
+
+### Final Choice
+
+YOLOv8n
+
+### Why
+
+The challenge required processing retail footage efficiently on local hardware. YOLOv8n provided:
+
+* Fast inference
+* CPU-friendly execution
+* Easy OpenCV integration
+* Strong community support
+
+While larger models could improve accuracy, they would increase latency and deployment complexity.
 
 ---
 
-# 1. YOLOv8 for Detection
+## Decision 2: Event Schema Design
 
-YOLOv8n was selected because it provides:
+### Options Considered
 
-* fast inference
-* lightweight deployment
-* real-time capability
-* easy integration with OpenCV
+#### Option A
 
-The nano model was preferred for CPU compatibility and faster local experimentation.
+Store raw frame detections:
 
----
+```json
+{
+  "frame_id": 101,
+  "bbox": [...]
+}
+```
 
-# 2. ByteTrack for Tracking
+#### Option B
 
-ByteTrack was used for multi-object tracking because:
+Generate business-level events:
 
-* stable ID assignment
-* lightweight integration
-* strong real-time performance
-* minimal configuration overhead
+```json
+{
+  "event_type": "ZONE_ENTER"
+}
+```
 
----
+### AI Suggestion
 
-# 3. Semantic Event Architecture
+AI recommended an event-based architecture because the downstream requirements focused on analytics rather than computer vision outputs.
 
-Instead of storing raw detections only, the system generates semantic retail events such as:
+### Final Choice
+
+Business-level event architecture.
+
+### Why
+
+This reduced storage requirements and made metrics, funnel analytics, anomaly detection, and dashboard visualization significantly easier to implement.
+
+Examples:
 
 * ENTRY
-* ZONE_DWELL
+* EXIT
+* ZONE_ENTER
 * BILLING_QUEUE_JOIN
 * PURCHASE
 
-This makes downstream analytics significantly easier and closer to real production retail intelligence systems.
+---
+
+## Decision 3: API Architecture
+
+### Options Considered
+
+#### Option A
+
+Compute metrics directly from raw files.
+
+#### Option B
+
+Expose a dedicated analytics API layer.
+
+### AI Suggestion
+
+AI suggested separating analytics from the detection pipeline through a service layer exposed by REST endpoints.
+
+### Final Choice
+
+FastAPI-based analytics service.
+
+### Why
+
+Benefits included:
+
+* Clear separation of concerns
+* Easier dashboard integration
+* Scalable architecture
+* Independent testing of analytics logic
+
+Endpoints include:
+
+* /events/ingest
+* /events/batch_ingest
+* /stores/{store_id}/metrics
+* /stores/{store_id}/funnel
+* /health
 
 ---
 
-# 4. Zone Stabilization Buffer
+## Additional Engineering Tradeoffs
 
-A zone stabilization mechanism was introduced to reduce event flapping caused by centroid jitter and rapid boundary switching.
+### Zone Stabilization Buffer
 
-Visitors must remain in a candidate zone for a minimum stability duration before transitions are confirmed.
+A stabilization buffer was added to reduce rapid zone switching caused by tracking jitter.
 
-This significantly improved event quality.
+### Purchase Correlation
 
----
+Nearest billing queue matching was used because POS timestamps and synthetic CV timestamps were not perfectly aligned.
 
-# 5. Purchase Correlation Strategy
+### Staff Detection
 
-The provided POS dataset contained synthetic timestamps that did not perfectly align with replay-generated CV events.
+A simple color-based staff classifier was considered but rejected due to high false-positive risk. The system retains an extensible is_staff field for future ReID-based approaches.
 
-To handle this, nearest billing queue matching was used instead of strict real-time timestamp correlation.
+### Database Choice
 
-This approach was chosen to maintain realistic purchase attribution while working with synthetic challenge data.
+SQLite was selected for simplicity and portability. PostgreSQL would be preferred in production environments.
 
----
+### Deployment
 
-# 6. SQLite for Persistence
-
-SQLite was selected because:
-
-* lightweight setup
-* zero infrastructure dependency
-* fast local experimentation
-* simple deployment
-
-For production-scale systems, PostgreSQL or distributed OLAP systems would be preferable.
-
----
-
-# 7. Replay Engine
-
-A replay architecture was implemented to simulate real-time streaming from offline generated events.
-
-This enables:
-
-* backend testing
-* dashboard testing
-* pipeline debugging
-* event simulation
-
-without requiring live camera feeds.
-
----
-
-# 8. Batch Ingestion API
-
-Batch ingestion support was added to improve scalability and reduce API overhead during replay streaming.
-
-This is more representative of production event pipelines.
-
----
-
-# 9. Funnel Analytics
-
-Dedicated funnel APIs were implemented to support business-level retail analytics such as:
-
-* visitor engagement
-* billing conversion
-* purchase conversion
-
-This transforms raw CV events into actionable retail intelligence.
-
----
-
-# 10. Staff Filtering Decision
-
-A simplistic uniform-color heuristic was considered for staff detection.
-
-However, because customer clothing can overlap with staff colors, fully enabling this logic risked introducing false positives.
-
-Instead, the system keeps an extensible `is_staff` hook reserved for future improvements such as:
-
-* ReID embeddings
-* uniform classification
-* dwell behavior analysis
-* restricted-zone persistence
-
----
-
-# 11. Dockerization
-
-The system was containerized using Docker and Docker Compose to improve:
-
-* reproducibility
-* deployment portability
-* local development consistency
-
----
-
-# 12. Future Improvements
-
-Potential future extensions include:
-
-* Kafka streaming
-* cloud deployment
-* distributed analytics
-* RTSP ingestion
-* advanced ReID
-* multi-camera identity stitching
-* vector event search
-* edge deployment
+Docker and Docker Compose were used to ensure reproducibility and simplify evaluation.
