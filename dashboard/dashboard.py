@@ -260,26 +260,26 @@ st.caption(
 # BACKEND URL
 # =====================================================
 
-API_URL = "https://purplletech-1.onrender.com"
+BASE_URL = "http://backend:8000"
 
 # =====================================================
 # FETCH DATA
 # =====================================================
 
 metrics = requests.get(
-    f"{API_URL}/metrics"
+    f"{BASE_URL}/metrics"
 ).json()
 
 heatmap = requests.get(
-    f"{API_URL}/heatmap"
+    f"{BASE_URL}/heatmap"
 ).json()
 
 anomalies = requests.get(
-    f"{API_URL}/anomalies"
+    f"{BASE_URL}/anomalies"
 ).json()
 
 events_response = requests.get(
-    f"{API_URL}/events"
+    f"{BASE_URL}/events"
 ).json()
 
 events = events_response["events"]
