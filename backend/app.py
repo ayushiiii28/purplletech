@@ -7,7 +7,7 @@ import json
 
 from fastapi import FastAPI, Request
 
-from database import conn, cursor
+from backend.database import conn, cursor
 
 # =====================================================
 # CREATE FASTAPI APP
