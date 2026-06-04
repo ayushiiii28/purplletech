@@ -2,56 +2,89 @@
 
 ## Overview
 
-This project is a production-inspired AI retail analytics system designed to monitor in-store customer behavior using computer vision, event engineering, analytics APIs, and real-time dashboards.
+The AI-Powered Retail Store Intelligence System transforms retail CCTV footage into actionable business intelligence using Computer Vision, Event Intelligence, Analytics APIs, and Real-Time Dashboards.
 
-The system processes retail store video feeds, tracks visitors, generates semantic behavioral events, correlates POS purchases, and exposes analytics through FastAPI and Streamlit dashboards.
+The system detects and tracks visitors, generates semantic behavioral events, correlates purchases from POS transactions, and exposes analytics through a FastAPI backend and Streamlit dashboard.
+
+The solution is designed around a single business objective:
+
+## North Star Metric
+
+### Offline Store Conversion Rate
+
+```text
+Conversion Rate =
+Purchasing Visitors ÷ Total Visitors
+```
+
+Every component in the system is designed to either improve the accuracy of this metric or make it more actionable for retail operations teams.
 
 ---
 
-# Features
+# Key Features
 
 * Multi-store support
 * YOLOv8-based person detection
 * ByteTrack-based multi-object tracking
-* Zone intelligence
-* Queue analytics
+* Entry and Exit detection
+* Zone intelligence and customer journey tracking
 * Dwell time analytics
-* Purchase correlation
+* Billing queue analytics
+* Purchase correlation using POS data
 * Funnel analytics
+* Anomaly detection
 * Real-time replay engine
-* FastAPI backend
-* Streamlit analytics dashboard
+* FastAPI analytics backend
+* Streamlit dashboard
 * SQLite persistence
 * Batch ingestion APIs
 * Health monitoring APIs
+* Dockerized deployment
+
+---
+
+# Business Questions Answered
+
+The system helps answer key retail questions:
+
+| Business Question                         | System Component  |
+| ----------------------------------------- | ----------------- |
+| How many customers visited and purchased? | Metrics API       |
+| Where are customers dropping off?         | Funnel Analytics  |
+| Which zones receive attention?            | Heatmap Analytics |
+| Are billing queues increasing?            | Queue Analytics   |
+| Is conversion rate declining?             | Anomaly Detection |
+| Is any feed stale or unhealthy?           | Health Endpoint   |
 
 ---
 
 # System Architecture
 
 ```text
-Camera Feed
-    ↓
+Retail Video
+      ↓
 YOLOv8 Detection
-    ↓
+      ↓
 ByteTrack Tracking
-    ↓
-Zone Intelligence Engine
-    ↓
+      ↓
+Zone Intelligence
+      ↓
 Event Generation
-    ↓
+      ↓
+Purchase Correlation
+      ↓
 FastAPI Backend
-    ↓
+      ↓
 SQLite Database
-    ↓
-Analytics Dashboard
+      ↓
+Streamlit Dashboard
 ```
 
 ---
 
 # Event Types
 
-The system generates semantic retail events including:
+The system generates semantic retail events:
 
 * ENTRY
 * EXIT
@@ -63,41 +96,80 @@ The system generates semantic retail events including:
 * PURCHASE
 * REENTRY
 
+These events form the foundation for all downstream analytics.
+
 ---
 
-# Folder Structure
+# Project Structure
 
 ```text
 project/
 │
-├── app.py
-├── dashboard.py
-├── replay.py
-├── purchase_correlator.py
-├── generic_pipeline.py
-├── database.py
+├── backend/
+│   ├── app.py
+│   ├── database.py
+│   ├── replay.py
+│   └── requirements.txt
+│
+├── dashboard/
+│   └── dashboard.py
+│
+├── pipelines/
+│   ├── generic_pipeline.py
+│   └── purchase_correlator.py
 │
 ├── configs/
+│
 ├── data/
-├── videos/
+│
+├── tests/
+│   └── test_api.py
 │
 ├── Dockerfile
 ├── docker-compose.yml
-├── requirements.txt
 │
 ├── README.md
+├── DESIGN.md
 └── CHOICES.md
 ```
 
 ---
 
-# APIs
+# AI Engineering Documentation
 
-## Health
+The project includes dedicated AI engineering documentation:
+
+### DESIGN.md
+
+Contains:
+
+* Architecture overview
+* Design rationale
+* AI-assisted decisions
+* Tradeoffs and future improvements
+
+### CHOICES.md
+
+Documents:
+
+* Detection model selection
+* Event schema design decisions
+* API architecture choices
+* Engineering tradeoffs
+
+---
+
+# Analytics APIs
+
+## Health Monitoring
 
 ```http
 GET /health
 ```
+
+Monitors service health and stale feeds.
+
+---
 
 ## Metrics
 
@@ -105,11 +177,24 @@ GET /health
 GET /metrics
 ```
 
-## Heatmap
+Provides:
+
+* Visitors
+* Purchases
+* Revenue
+* Conversion metrics
+
+---
+
+## Heatmap Analytics
 
 ```http
 GET /heatmap
 ```
+
+Provides zone-level engagement insights.
+
+---
 
 ## Funnel Analytics
 
@@ -117,11 +202,26 @@ GET /heatmap
 GET /stores/{store_id}/funnel
 ```
 
+Tracks customer progression through:
+
+```text
+ENTRY
+→ ZONE ENGAGEMENT
+→ BILLING
+→ PURCHASE
+```
+
+---
+
 ## Event Ingestion
 
 ```http
 POST /events/ingest
 ```
+
+Single event ingestion.
+
+---
 
 ## Batch Event Ingestion
 
@@ -129,31 +229,91 @@ POST /events/ingest
 POST /events/batch_ingest
 ```
 
+Bulk ingestion for scalable event streaming.
+
 ---
 
-# Running the System
+## Anomaly Detection
 
-## 1. Start Backend
+```http
+GET /anomalies
+```
+
+Identifies:
+
+* Queue spikes
+* Conversion drops
+* Operational anomalies
+
+---
+
+# Dashboard Features
+
+The Streamlit dashboard provides:
+
+* Visitor Analytics
+* Purchase Analytics
+* Revenue Monitoring
+* Conversion Funnel
+* Queue Monitoring
+* Heatmap Analytics
+* Store-level Insights
+* Event Distribution
+* Health Monitoring
+* Anomaly Detection
+
+---
+
+# Testing
+
+The project includes pytest-based validation.
+
+Run tests:
 
 ```bash
+pytest tests/
+```
+
+Covered edge cases:
+
+* Empty store
+* All-staff scenario
+* Zero purchases
+* Re-entry handling
+* Health endpoint validation
+
+---
+
+# Running Locally
+
+## Backend
+
+```bash
+cd backend
 uvicorn app:app --reload
 ```
 
-## 2. Replay Events
+---
+
+## Replay Engine
 
 ```bash
+cd backend
 python replay.py
 ```
 
-## 3. Launch Dashboard
+---
+
+## Dashboard
 
 ```bash
+cd dashboard
 streamlit run dashboard.py
 ```
 
 ---
 
-# Docker Setup
+# Docker Deployment (Recommended)
 
 ## Build
 
@@ -169,17 +329,25 @@ docker compose up
 
 ---
 
-# Dashboard Features
+## Services
 
-* Visitor analytics
-* Conversion funnel
-* Revenue metrics
-* Queue monitoring
-* Heatmaps
-* Camera-wise analytics
-* Store-wise analytics
-* Event distribution
-* Anomaly detection
+Backend API:
+
+```text
+http://localhost:8000/docs
+```
+
+Dashboard:
+
+```text
+http://localhost:8501
+```
+
+Health Endpoint:
+
+```text
+http://localhost:8000/health
+```
 
 ---
 
@@ -193,18 +361,50 @@ docker compose up
 * Streamlit
 * SQLite
 * Plotly
+* Pandas
 * Docker
+* Docker Compose
+
+---
+
+# Challenge Deliverables
+
+Included in this submission:
+
+* Computer Vision Pipeline
+* Event Intelligence Layer
+* Purchase Correlation Engine
+* FastAPI Analytics Backend
+* Funnel Analytics
+* Health Monitoring
+* Batch Ingestion Support
+* Streamlit Dashboard
+* Dockerized Deployment
+* README.md
+* DESIGN.md
+* CHOICES.md
+* Pytest Test Suite
 
 ---
 
 # Future Improvements
 
-* Real RTSP stream ingestion
+Potential future enhancements include:
+
+* Staff identification using ReID
+* Cross-camera identity stitching
+* RTSP live stream ingestion
 * Kafka-based event streaming
-* ReID-based visitor tracking
-* Staff recognition
 * Cloud deployment
-* Distributed analytics pipeline
+* Distributed analytics infrastructure
+* Advanced anomaly detection
 * Vector search for event retrieval
 
+---
+
+# Conclusion
+
+The AI-Powered Retail Store Intelligence System demonstrates how retail video can be transformed into actionable business intelligence through Computer Vision, Event Engineering, Analytics APIs, and Real-Time Dashboards.
+
+By focusing on Offline Store Conversion Rate as the North Star Metric, the system connects low-level visual signals to meaningful business outcomes.
 
